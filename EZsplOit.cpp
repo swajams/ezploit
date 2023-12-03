@@ -50,26 +50,38 @@ int menu() {
 }
 
 
-string getLocalIPAddress() {
-    // Use which command to get the absolute path of ip command
-    string ipCommandPath;
-    ifstream ipCommandStream("/usr/bin/which ip");
-    getline(ipCommandStream, ipCommandPath);
-
+std::string getLocalIPAddress() {
     // Use platform-specific command to get local IP address
-    string ipAddress;
-    ifstream stream(ipCommandPath);
-    string line;
-    while (getline(stream, line)) {
-        istringstream iss(line);
-        if (line.find("inet") != string::npos) {
-            iss >> ipAddress;
+    std::string ipAddress;
+    
+    // Open a pipe to the command and read its output
+    FILE* pipe = popen("/sbin/ip a s", "r");
+    
+    if (!pipe) {
+        std::cerr << "Error opening pipe to command." << std::endl;
+        return "";
+    }
+
+    char buffer[128];
+    while (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
+        std::cout << buffer;  // Print each line (optional)
+        
+        if (strstr(buffer, "inet") != nullptr) {
+            // Extract IP address (modify this as needed)
+            char* start = strstr(buffer, "inet") + 5;
+            char* end = strchr(start, '/');
+            if (end != nullptr) {
+                *end = '\0';
+            }
+            ipAddress = start;
             break;
         }
     }
+
+    pclose(pipe);
+    
     return ipAddress;
 }
-
 int scan() {
     cout << "Scanning..." << endl;
 
