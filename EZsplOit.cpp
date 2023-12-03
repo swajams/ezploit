@@ -4,7 +4,8 @@
 #include <fstream>
 using namespace std;
 
-
+#define RESET_COLOR "\033[0m"
+#define RED_COLOR "\033[31m"
 
 int menu() {
     int choice;
@@ -74,7 +75,7 @@ int scan(){
 
 
 int main() {
-  cout << R"(
+  cout <<RED_COLOR<<R"(
        __             _,-^~^"-.
      _// )      _,-^~`         `.
    ." ( /`"-,-"`                 ;
@@ -87,7 +88,7 @@ int main() {
        ((("`             (((---~"`         //
                                           ((________________
                                           `----^^^^^^^^''''
-)" <<endl;
+)" <<RESET_COLOR<<endl;
 int option;
 option = menu();
 
