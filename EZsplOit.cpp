@@ -1,4 +1,7 @@
 #include <iostream>
+#include <string>
+#include <sstream>
+#include <fstream>
 using namespace std;
 
 
@@ -47,9 +50,25 @@ int menu() {
 
 int scan(){
     
-    cout << "Scanning..." << endl;
-    const char* ScanCommand ="ifconfig";
-    int result = system(ScanCommand);
+    cout << "Scanning..." << endl; 
+    
+
+    // Use platform-specific command to get local IP address
+    string ipAddress;
+    ifstream stream("/sbin/ip a s");
+    string line;
+    while (getline(stream, line)) {
+        istringstream iss(line);
+        if (line.find("inet") != string::npos) {
+            iss >> ipAddress;
+            break;
+        }
+    }
+    cout <<ipAddress<<endl;
+    string scanCommand = "nmap -sn "+ipAddress+"/24";
+    int result = system(scanCommand,c_str());
+    return result;
+
 }
 
 
