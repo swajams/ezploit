@@ -49,14 +49,16 @@ int menu() {
 
 }
 
-int scan(){
-    
-    cout << "Scanning..." << endl; 
-    
+
+string getLocalIPAddress() {
+    // Use which command to get the absolute path of ip command
+    string ipCommandPath;
+    ifstream ipCommandStream("/usr/bin/which ip");
+    getline(ipCommandStream, ipCommandPath);
 
     // Use platform-specific command to get local IP address
     string ipAddress;
-    ifstream stream("/sbin/ip a s");
+    ifstream stream(ipCommandPath);
     string line;
     while (getline(stream, line)) {
         istringstream iss(line);
@@ -65,11 +67,24 @@ int scan(){
             break;
         }
     }
-    cout <<ipAddress<<endl;
-    string scanCommand = "nmap -sn "+ipAddress+"/24";
-    int result = system(scanCommand,c_str());
-    return result;
+    return ipAddress;
+}
 
+int scan() {
+    cout << "Scanning..." << endl;
+
+    // Get local IP address
+    string localIPAddress = getLocalIPAddress();
+
+    cout << "Local IP Address: " << localIPAddress << endl;
+
+    // Formulate the nmap command using the local IP address
+    string scanCommand = "nmap -sn " + localIPAddress + "/24";
+
+    // Run the nmap command
+    int result = system(scanCommand.c_str());
+
+    return result;
 }
 
 
