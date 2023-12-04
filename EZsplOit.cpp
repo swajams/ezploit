@@ -4,6 +4,7 @@
 #include <fstream>
 #include <cstring>
 #include <algorithm>
+#include <vector>
 using namespace std;
 
 #define RESET_COLOR "\033[0m"
@@ -53,10 +54,8 @@ int menu() {
 
 
 std::string getLocalIPAddress() {
-    // Use platform-specific command to get local IP address
     std::string ipAddress;
 
-    // Open a pipe to the command and read its output
     FILE* pipe = popen("/sbin/ip -o -4 a s | awk '{print $4}' | cut -d/ -f1", "r");
 
     if (!pipe) {
@@ -66,19 +65,14 @@ std::string getLocalIPAddress() {
 
     char buffer[128];
     while (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
-        std::cout << buffer;  // Print each line (optional)
 
-        // Extract IP address (modify this as needed)
         ipAddress = buffer;
-
-        // Erase newline characters
         ipAddress.erase(std::remove_if(ipAddress.begin(), ipAddress.end(),
                                        [](char c) { return c == '\n' || c == '\r'; }),
                         ipAddress.end());
 
-        // Skip the loopback address (127.0.0.1)
         if (ipAddress != "127.0.0.1") {
-            break;  // Assuming you want the first non-loopback IPv4 address found
+            break;
         }
     }
 
@@ -88,23 +82,55 @@ std::string getLocalIPAddress() {
 }
 
 
-int scan() {
-    cout << "Scanning..." << endl;
+std::vector<std::string> getActiveIPs(const std::string& nmapOutput) {
+    std::vector<std::string> activeIPs;
 
-    // Get local IP address
-    string localIPAddress = getLocalIPAddress();
+    std::istringstream iss(nmapOutput);
+    std::string line;
+    while (std::getline(iss, line)) {
+        // Process each line of nmap output to identify active IP addresses
+        // Example: Check if the line contains "Nmap scan report" (modify this as needed)
+        if (line.find("Nmap scan report") != std::string::npos) {
+            size_t start = line.find("for ") + 4;
+            size_t end = line.find(" ", start);
+            if (end != std::string::npos) {
+                std::string ip = line.substr(start, end - start);
+                activeIPs.push_back(ip);
+            }
+        }
+    }
 
-    cout << "Local IP Address: " << localIPAddress << endl;
-
-    // Formulate the nmap command using the local IP address
-    string scanCommand = "nmap -sn " + localIPAddress + "/24";
-
-    // Run the nmap command
-    int result = system(scanCommand.c_str());
-
-    return result;
+    return activeIPs;
 }
 
+std::vector<string> scan() {
+    cout << "Scanning..." << endl;
+
+    string localIPAddress = getLocalIPAddress();
+
+    cout << "IP Address: " << localIPAddress << endl;
+
+    string scanCommand = "nmap -sn " + localIPAddress + "/24";
+
+    FILE* pipe = popen(scanCommand.c_str(), "r");
+    if (!pipe) {
+        cerr << "Error opening pipe to nmap command" << endl;
+        return {};  // Return an empty vector in case of an error
+    }
+
+    char buffer[128];
+    string nmapOutput;
+    while (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
+        nmapOutput += buffer;
+        cout << buffer;
+    }
+
+    pclose(pipe);
+
+    vector<string> activeIPs = getActiveIPs(nmapOutput);
+
+    return activeIPs;
+}
 
 
 int main() {
@@ -125,7 +151,7 @@ int main() {
 int option;
 option = menu();
 
-if(option == 1 ){scan();}
+if(option == 1 ){vector<string> targets = scan();}
 
     return 0;
 }
