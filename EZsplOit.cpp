@@ -3,6 +3,7 @@
 #include <sstream>
 #include <fstream>
 #include <cstring>
+#include <algorithm>
 using namespace std;
 
 #define RESET_COLOR "\033[0m"
@@ -50,6 +51,7 @@ int menu() {
 
 }
 
+
 std::string getLocalIPAddress() {
     // Use platform-specific command to get local IP address
     std::string ipAddress;
@@ -68,8 +70,11 @@ std::string getLocalIPAddress() {
 
         // Extract IP address (modify this as needed)
         ipAddress = buffer;
-        // Remove newline character if present
-        ipAddress.erase(std::remove(ipAddress.begin(), ipAddress.end(), '\n'), ipAddress.end());
+
+        // Erase newline characters
+        ipAddress.erase(std::remove_if(ipAddress.begin(), ipAddress.end(),
+                                       [](char c) { return c == '\n' || c == '\r'; }),
+                        ipAddress.end());
 
         // Skip the loopback address (127.0.0.1)
         if (ipAddress != "127.0.0.1") {
@@ -81,7 +86,6 @@ std::string getLocalIPAddress() {
 
     return ipAddress;
 }
-
 
 
 int scan() {
