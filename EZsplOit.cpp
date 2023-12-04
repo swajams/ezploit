@@ -51,10 +51,7 @@ int menu() {
 
 
 std::string getLocalIPAddress() {
-    // Use platform-specific command to get local IP address
     std::string ipAddress;
-    
-    // Open a pipe to the command and read its output
     FILE* pipe = popen("/sbin/ip a s", "r");
     
     if (!pipe) {
@@ -66,7 +63,7 @@ std::string getLocalIPAddress() {
     while (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
         std::cout << buffer;  // Print each line (optional)
         
-        if (strstr(buffer, "inet") != nullptr) {
+        if (strstr(buffer, "inet") != nullptr && (buffer, "127.")==nullptr) {
             // Extract IP address (modify this as needed)
             char* start = strstr(buffer, "inet") + 5;
             char* end = strchr(start, '/');
