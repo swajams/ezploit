@@ -57,21 +57,39 @@ int menu() {
 
 }
 
-int target(vector<string> Targets){]
-
-    cout << "\n Targets:  " << endl;
+vector<string> target(const vector<string>& Targets) {
+    cout << "\nTargets: " << endl;
     int i = 0;
-    if(Targets.empty()){
-        cout << "No Targets found. Perform a Scan" << endl;
-        return 0;
-    }
-    
-    for(const string& ip : Targets){
-        cout << ++i<<". " <<ip << endl;
-    }
-    
-}
 
+    if (Targets.empty()) {
+        cout << "No Targets found. Perform a Scan" << endl;
+        return {};  // Return an empty vector to indicate no valid targets
+    }
+
+    for (const string& ip : Targets) {
+        cout << ++i << ". " << ip << endl;
+    }
+
+    cout << "Select First Target (1-" << i << ") or press any other key to exit. " << endl;
+    int firstOption;
+    cin >> firstOption;
+
+    if (firstOption >= 1 && firstOption <= i) {
+        cout << "Enter Second Target (1-" << i << ") or press any other key to exit. " << endl;
+        int secondOption;
+        cin >> secondOption;
+
+        if (secondOption >= 1 && secondOption <= i) {
+            // Return both selected targets' IP addresses
+            return {Targets[firstOption - 1], Targets[secondOption - 1]};  // Adjust index to match vector indexing
+        } else {
+            // Return only the first selected target's IP address
+            return {Targets[firstOption - 1]};
+        }
+    }
+
+    return {};  // Return an empty vector to indicate no valid targets
+}
 
 
 std::string getLocalIPAddress() {
@@ -186,7 +204,10 @@ int main() {
         if (option == 1) {
             targets = scan();
         } else if (option == 2) {
-            target(targets);
+            vector <string> TargetIPs = target(targets);
+            for (const string& ips : TargetIPs) {
+                cout << ips << endl;
+            }
         }
 
     } while (option != 0);
