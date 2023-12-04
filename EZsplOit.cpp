@@ -19,6 +19,7 @@ int menu() {
         std::cout << "1. Scan" << std::endl;
         std::cout << "2. Targets" << std::endl;
         std::cout << "3. Attacks" << std::endl;
+        std::cout << "4. Quit" << std::endl;
 
         string input;
         char option;
@@ -43,6 +44,10 @@ int menu() {
                 choice = 3;
                 validInput = true;
                 break;
+            case '4':
+                choice = 0;
+                validInput = true;
+                break;
             default:
                 std::cout << "INVALID INPUT! Please enter a valid option." << std::endl;
         }
@@ -54,6 +59,11 @@ int menu() {
 
 int target(vector<string> Targets){
     cout << "\n Targets:  " << endl;
+    if(Targets.empty()){
+        cout << "No Targets found. Perform a Scan" << endl;
+        return 0;
+    }
+    
     for(const string& ip : Targets){
         cout << ip << endl;
     }
@@ -157,10 +167,12 @@ int main() {
                                           `----^^^^^^^^''''
 )" <<RESET_COLOR<<endl;
     int option;
-    option = menu();
-    vector<string> targets; 
-    if(option == 1 ){targets = scan();}
-    else if (option == 2){target(targets);}
+    while (option != 0){
+        option = menu();
+        vector<string> targets; 
+        if(option == 1 ){targets = scan();}
+        else if (option == 2){target(targets);}
+    }
       return 0;
 }
 
