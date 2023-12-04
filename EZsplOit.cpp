@@ -57,15 +57,17 @@ int menu() {
 
 }
 
-int target(vector<string> Targets){
+int target(vector<string> Targets){]
+
     cout << "\n Targets:  " << endl;
+    int i = 0;
     if(Targets.empty()){
         cout << "No Targets found. Perform a Scan" << endl;
         return 0;
     }
     
     for(const string& ip : Targets){
-        cout << ip << endl;
+        cout << ++i<<". " <<ip << endl;
     }
     
 }
@@ -106,44 +108,53 @@ std::vector<std::string> getActiveIPs(const std::string& nmapOutput) {
     istringstream iss(nmapOutput);
     string line;
     while (std::getline(iss, line)) {
-        // Process each line of nmap output to identify active IP addresses
-        // Example: Check if the line contains "Nmap scan report" (modify this as needed)
+
         if (line.find("Nmap scan report") != std::string::npos) {
             size_t start = line.find("for ") + 4;
             size_t end = line.find(" ", start);
-            if (end != std::string::npos) {
+            //if (end != std::string::npos) {
                 std::string ip = line.substr(start, end - start);
                 activeIPs.push_back(ip);
-            }
+           // }
         }
     }
 
     return activeIPs;
 }
 
-std::vector<string> scan() {
+vector<string> scan() {
     cout << "Scanning..." << endl;
 
     string localIPAddress = getLocalIPAddress();
 
     cout << "IP Address: " << localIPAddress << endl;
 
-    string scanCommand = "nmap -sn " + localIPAddress + "/24";
+    string outputFileName = "nmap_output.txt";
+    string scanCommand = "nmap -sn " + localIPAddress + "/24 > " + outputFileName;
 
-    FILE* pipe = popen(scanCommand.c_str(), "r");
-    if (!pipe) {
-        cerr << "Error opening pipe to nmap command" << endl;
+    // Execute nmap command and redirect output to a file
+    int result = system(scanCommand.c_str());
+    if (result != 0) {
+        cerr << "Error executing nmap command" << endl;
         return {};  // Return an empty vector in case of an error
     }
 
-    char buffer[128];
+    // Read the contents of the output file into a string
     string nmapOutput;
-    while (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
-        nmapOutput += buffer;
-        cout << buffer;
+    ifstream outputFileStream(outputFileName);
+    if (outputFileStream.is_open()) {
+        string line;
+        while (getline(outputFileStream, line)) {
+            nmapOutput += line + "\n";
+        }
+        outputFileStream.close();
+    } else {
+        cerr << "Error opening nmap output file" << endl;
+        return {};  // Return an empty vector in case of an error
     }
 
-    pclose(pipe);
+    // Remove the temporary output file
+    remove(outputFileName.c_str());
 
     vector<string> activeIPs = getActiveIPs(nmapOutput);
 
@@ -167,13 +178,20 @@ int main() {
                                           `----^^^^^^^^''''
 )" <<RESET_COLOR<<endl;
     int option;
-    while (option != 0){
+    vector<string> targets;
+
+    do {
         option = menu();
-        vector<string> targets; 
-        if(option == 1 ){targets = scan();}
-        else if (option == 2){target(targets);}
-    }
-      return 0;
+
+        if (option == 1) {
+            targets = scan();
+        } else if (option == 2) {
+            target(targets);
+        }
+
+    } while (option != 0);
+
+    return 0;
 }
 
 
