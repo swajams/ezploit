@@ -52,6 +52,15 @@ int menu() {
 
 }
 
+int target(vector<string> Targets){
+    cout << "\n Targets:  " << endl;
+    for(const string& ip : Targets){
+        cout << ip << endl;
+    }
+    
+}
+
+
 
 std::string getLocalIPAddress() {
     std::string ipAddress;
@@ -84,9 +93,8 @@ std::string getLocalIPAddress() {
 
 std::vector<std::string> getActiveIPs(const std::string& nmapOutput) {
     std::vector<std::string> activeIPs;
-
-    std::istringstream iss(nmapOutput);
-    std::string line;
+    istringstream iss(nmapOutput);
+    string line;
     while (std::getline(iss, line)) {
         // Process each line of nmap output to identify active IP addresses
         // Example: Check if the line contains "Nmap scan report" (modify this as needed)
@@ -148,12 +156,12 @@ int main() {
                                           ((________________
                                           `----^^^^^^^^''''
 )" <<RESET_COLOR<<endl;
-int option;
-option = menu();
-
-if(option == 1 ){vector<string> targets = scan();}
-
-    return 0;
+    int option;
+    option = menu();
+    vector<string> targets; 
+    if(option == 1 ){targets = scan();}
+    else if (option == 2){target(targets);}
+      return 0;
 }
 
 
