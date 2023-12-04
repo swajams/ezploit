@@ -2,6 +2,7 @@
 #include <string>
 #include <sstream>
 #include <fstream>
+#include <cstring>
 using namespace std;
 
 #define RESET_COLOR "\033[0m"
@@ -49,11 +50,13 @@ int menu() {
 
 }
 
-
 std::string getLocalIPAddress() {
+    // Use platform-specific command to get local IP address
     std::string ipAddress;
-    FILE* pipe = popen("/sbin/ip a s", "r");
-    
+
+    // Open a pipe to the command and read its output
+    FILE* pipe = popen("/sbin/ip -o -4 a s | awk '{print $4}' | cut -d/ -f1", "r");
+
     if (!pipe) {
         std::cerr << "Error opening pipe to command." << std::endl;
         return "";
@@ -62,23 +65,25 @@ std::string getLocalIPAddress() {
     char buffer[128];
     while (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
         std::cout << buffer;  // Print each line (optional)
-        
-        if (strstr(buffer, "inet") != nullptr && (buffer, "127.")==nullptr) {
-            // Extract IP address (modify this as needed)
-            char* start = strstr(buffer, "inet") + 5;
-            char* end = strchr(start, '/');
-            if (end != nullptr) {
-                *end = '\0';
-            }
-            ipAddress = start;
-            break;
+
+        // Extract IP address (modify this as needed)
+        ipAddress = buffer;
+        // Remove newline character if present
+        ipAddress.erase(std::remove(ipAddress.begin(), ipAddress.end(), '\n'), ipAddress.end());
+
+        // Skip the loopback address (127.0.0.1)
+        if (ipAddress != "127.0.0.1") {
+            break;  // Assuming you want the first non-loopback IPv4 address found
         }
     }
 
     pclose(pipe);
-    
+
     return ipAddress;
 }
+
+
+
 int scan() {
     cout << "Scanning..." << endl;
 
