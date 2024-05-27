@@ -7,55 +7,47 @@
 #include <vector>
 using namespace std;
 
+
 #define RESET_COLOR "\033[0m"
 #define RED_COLOR "\033[31m"
 
+
+int userInput(int limit) {
+    std::string rawInput;
+    bool loop = true;
+    char value;
+
+    while (loop) {
+        std::cout << "Please enter a number between 1 and " << limit << ": ";
+        std::cin >> rawInput;
+
+        if (rawInput.length() == 1) {
+            value = rawInput[0];
+            if (std::isdigit(static_cast<unsigned char>(value))) {
+                int option = value - '0';
+                if (option > 0 && option <= limit) {
+                    loop = false;
+                    return option; // Return the validated integer
+                }else {std::cout << "Invalid value. Please enter a valid option" << std::endl;}
+            }else {std::cout << "Invalid value. Please enter a valid integer!" << std::endl;}
+        }else {std::cout << "Invalid value. Please enter one character only!" << std::endl;}
+    }
+    // If somehow the loop exits without returning a value, which shouldn't happen:
+    return -1;
+}
+
+
 int menu() {
-    int choice;
-    bool validInput = false;
-
-    do {
-        std::cout << "What would you like to do?" << std::endl;
-        std::cout << "1. Scan" << std::endl;
-        std::cout << "2. Targets" << std::endl;
-        std::cout << "3. Attacks" << std::endl;
-        std::cout << "4. Quit" << std::endl;
-
-        string input;
-        char option;
-        std::cin >> input;
-        if(input.length() == 1){
-             option = input[0];
-        }
-        else{
-            option = 0;
-        }
-
-        switch (option) {
-            case '1':
-                choice = 1;
-                validInput = true;
-                break;
-            case '2':
-                choice = 2;
-                validInput = true;
-                break;
-            case '3':
-                choice = 3;
-                validInput = true;
-                break;
-            case '4':
-                choice = 0;
-                validInput = true;
-                break;
-            default:
-                std::cout << "INVALID INPUT! Please enter a valid option." << std::endl;
-        }
-    } while (!validInput);
-
+    std::cout << "What would you like to do?" << std::endl;
+    std::cout << "1. Scan" << std::endl;
+    std::cout << "2. Targets" << std::endl;
+    std::cout << "3. Attacks" << std::endl;
+    std::cout << "4. Quit" << std::endl;
+    int choice = userInput(4);
     return choice;
 
 }
+
 
 vector<string> target(const vector<string>& Targets) {
     cout << "\nTargets: " << endl;
@@ -71,13 +63,12 @@ vector<string> target(const vector<string>& Targets) {
     }
 
     cout << "Select First Target (1-" << i << ") or press any other key to exit. " << endl;
-    int firstOption;
-    cin >> firstOption;
+    int firstOption = userInput(i);
+
 
     if (firstOption >= 1 && firstOption <= i) {
         cout << "Enter Second Target (1-" << i << ") or press any other key to exit. " << endl;
-        int secondOption;
-        cin >> secondOption;
+        int secondOption = userInput(i);
 
         if (secondOption >= 1 && secondOption <= i) {
             // Return both selected targets' IP addresses
@@ -90,7 +81,6 @@ vector<string> target(const vector<string>& Targets) {
 
     return {};  // Return an empty vector to indicate no valid targets
 }
-
 
 std::string getLocalIPAddress() {
     std::string ipAddress;
@@ -119,7 +109,6 @@ std::string getLocalIPAddress() {
 
     return ipAddress;
 }
-
 
 std::vector<std::string> getActiveIPs(const std::string& nmapOutput) {
     std::vector<std::string> activeIPs;
@@ -179,7 +168,6 @@ vector<string> scan() {
     return activeIPs;
 }
 
-
 int main() {
   cout <<RED_COLOR<<R"(
        __             _,-^~^"-.
@@ -208,6 +196,9 @@ int main() {
             for (const string& ips : TargetIPs) {
                 cout << ips << endl;
             }
+        }
+        else if (option == 3){
+            
         }
 
     } while (option != 0);
