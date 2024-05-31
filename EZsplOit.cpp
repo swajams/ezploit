@@ -3,6 +3,7 @@
 #include <sstream>
 #include <fstream>
 #include <cstring>
+#include <array>
 #include <algorithm>
 #include <vector>
 using namespace std;
@@ -36,7 +37,6 @@ int userInput(int limit) {
     return -1;
 }
 
-
 int menu() {
     std::cout << "What would you like to do?" << std::endl;
     std::cout << "1. Scan" << std::endl;
@@ -47,7 +47,6 @@ int menu() {
     return choice;
 
 }
-
 
 vector<string> target(const vector<string>& Targets) {
     cout << "\nTargets: " << endl;
@@ -64,22 +63,10 @@ vector<string> target(const vector<string>& Targets) {
 
     cout << "Select First Target (1-" << i << ") or press any other key to exit. " << endl;
     int firstOption = userInput(i);
-
-
-    if (firstOption >= 1 && firstOption <= i) {
-        cout << "Enter Second Target (1-" << i << ") or press any other key to exit. " << endl;
-        int secondOption = userInput(i);
-
-        if (secondOption >= 1 && secondOption <= i) {
-            // Return both selected targets' IP addresses
-            return {Targets[firstOption - 1], Targets[secondOption - 1]};  // Adjust index to match vector indexing
-        } else {
-            // Return only the first selected target's IP address
-            return {Targets[firstOption - 1]};
-        }
-    }
-
-    return {};  // Return an empty vector to indicate no valid targets
+    cout << "Enter Second Target (1-" << i << ") or enter "<< i+1 <<"if no second Target, press any other key to exit. " << endl;
+    int secondOption = userInput(i);
+    if (secondOption == i+1){return {Targets[firstOption - 1],0};}
+    else{return {Targets[firstOption - 1], Targets[secondOption - 1]};};  // Adjust index to match vector indexing
 }
 
 std::string getLocalIPAddress() {
@@ -168,6 +155,28 @@ vector<string> scan() {
     return activeIPs;
 }
 
+
+void portScan(string IP){
+    string portScanCommand = "nmap -sV " + IP;
+    
+    
+}
+
+int Attacks(std::vector<string>& vec){
+    cout << "1. Port Scan Target"<< endl;
+    cout << "2. Man In The Middle (MITM)"<< endl;
+    cout << "3. Denial of Service (DoS)"<< endl;
+    cout << "5. DeAuthenticate"<< endl;
+    cout << "6. Evil Twin AP"<< endl;
+    string IP = vec.front();
+    int attackChoice = userInput(6);
+    if (attackChoice == 1){
+        portScan(IP);
+    } 
+    
+}
+
+
 int main() {
   cout <<RED_COLOR<<R"(
        __             _,-^~^"-.
@@ -186,26 +195,26 @@ int main() {
     int option;
     vector<string> targets;
 
+    std::array<std::string, 2> TargetIPs; // Declare TargetIPs in a scope accessible to both option cases
+
     do {
         option = menu();
 
         if (option == 1) {
             targets = scan();
         } else if (option == 2) {
-            vector <string> TargetIPs = target(targets);
-            for (const string& ips : TargetIPs) {
-                cout << ips << endl;
-            }
-        }
-        else if (option == 3){
-            
+            // TargetIPs = target(targets); // Assign the result to TargetIPs
+            // for (const std::string& ips : TargetIPs) {
+                // std::cout << ips << std::endl;
+            // }
+        } else if (option == 3) {
+            Attacks(targets); // Pass TargetIPs to the Attacks function
         }
 
     } while (option != 0);
 
     return 0;
 }
-
 
 
 
