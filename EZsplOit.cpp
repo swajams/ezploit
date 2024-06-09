@@ -157,7 +157,6 @@ vector<string> scan() {
     return activeIPs;
 }
 
-
 void portScan(string IP){
     string portScanCommand = "nmap -sV " + IP;
     int result = system(portScanCommand.c_str());
@@ -203,7 +202,7 @@ int main() {
     int option;
     vector<string> targets;
 
-    std::array<std::string, 2> TargetIPs; // Declare TargetIPs in a scope accessible to both option cases
+    std::vector<std::string> TargetIPs; // Declare TargetIPs in a scope accessible to both option cases
 
     do {
         option = menu();
@@ -211,12 +210,12 @@ int main() {
         if (option == 1) {
             targets = scan();
         } else if (option == 2) {
-            // TargetIPs = target(targets); // Assign the result to TargetIPs
+            TargetIPs = target(targets); // Assign the result to TargetIPs
             // for (const std::string& ips : TargetIPs) {
                 // std::cout << ips << std::endl;
             // }
         } else if (option == 3) {
-            Attacks(targets); // Pass TargetIPs to the Attacks function
+            Attacks(TargetIPs); // Pass TargetIPs to the Attacks function
         }
 
     } while (option != 0);
