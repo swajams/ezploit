@@ -148,7 +148,7 @@ vector<string> scan() {
     }
 
     // Remove the temporary output file
-   // remove(outputFileName.c_str());
+   remove(outputFileName.c_str());
 
     vector<string> activeIPs = getActiveIPs(nmapOutput);
     for (const std::string& ips : activeIPs) {
@@ -160,6 +160,11 @@ vector<string> scan() {
 
 void portScan(string IP){
     string portScanCommand = "nmap -sV " + IP;
+    int result = system(portScanCommand.c_str());
+    if (result != 0){
+        cerr << "Error executing Nmap command" << endl;
+    }
+    
     cout << "This is working" << endl;
     
 }
