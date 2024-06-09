@@ -151,14 +151,16 @@ vector<string> scan() {
    // remove(outputFileName.c_str());
 
     vector<string> activeIPs = getActiveIPs(nmapOutput);
-
+    for (const std::string& ips : activeIPs) {
+        std::cout << ips << std::endl;
+    }
     return activeIPs;
 }
 
 
 void portScan(string IP){
     string portScanCommand = "nmap -sV " + IP;
-    
+    cout << "This is working" << endl;
     
 }
 
