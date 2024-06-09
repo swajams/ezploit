@@ -148,7 +148,7 @@ vector<string> scan() {
     }
 
     // Remove the temporary output file
-    remove(outputFileName.c_str());
+   // remove(outputFileName.c_str());
 
     vector<string> activeIPs = getActiveIPs(nmapOutput);
 
@@ -173,6 +173,7 @@ int Attacks(std::vector<string>& vec){
     if (attackChoice == 1){
         portScan(IP);
     } 
+    return 0;
     
 }
 
